@@ -77,7 +77,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      // Force local state cleanup regardless of Supabase response
+      setUser(null);
+      setProfile(null);
+    }
   };
 
   const isAdmin = profile?.is_admin || false;
@@ -98,7 +106,7 @@ export const useAuth = () => useContext(AuthContext);
 SQL SETUP FOR SUPABASE (Run this in the SQL Editor):
 
 -- Create a table for public profiles
-create table profiles (
+create table if not exists profiles (
   id uuid references auth.users on delete cascade not null primary key,
   email text not null,
   is_admin boolean default false,
