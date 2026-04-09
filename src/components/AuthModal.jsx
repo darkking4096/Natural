@@ -6,6 +6,7 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
@@ -17,6 +18,13 @@ const AuthModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!isLogin && password !== confirmPassword) {
+      setError('As senhas não coincidem');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         await login(email, password);
@@ -25,7 +33,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       }
       onClose();
     } catch (err) {
-      setError(err.message || 'Ocorreu um erro');
+      setError(err.message === 'Failed to fetch' ? 'Erro de conexão: Verifique se o servidor Vite foi reiniciado e se as chaves em .env estão corretas.' : err.message || 'Ocorreu um erro');
     } finally {
       setLoading(false);
     }
@@ -94,6 +102,23 @@ const AuthModal = ({ isOpen, onClose }) => {
                 />
               </div>
             </div>
+
+            {!isLogin && (
+              <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+                <label className="text-sm font-medium text-text-secondary px-1">Confirmar Senha</label>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary group-focus-within:text-primary transition-colors" size={18} />
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-surface-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-text-primary"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"
