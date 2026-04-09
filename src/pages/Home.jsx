@@ -1,8 +1,11 @@
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { useProducts } from '../context/ProductContext';
+import { Loader2 } from 'lucide-react';
 
 const Home = () => {
+  const { products, loading } = useProducts();
+
   return (
     <div className="bg-surface-secondary">
       <Hero />
@@ -15,16 +18,17 @@ const Home = () => {
               <h2 className="text-primary-dark text-4xl font-bold font-display">Mais Vendidos</h2>
               <p className="mt-4 text-text-secondary text-lg max-w-xl">Produtos selecionados para transformar o seu cuidado diário em um ritual de saúde.</p>
             </div>
-            <a href="#" className="text-primary font-bold hover:underline flex items-center">
-              Ver toda coleção <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-            </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={40} /></div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {products.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

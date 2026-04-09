@@ -1,8 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
+  const { user, setIsAuthModalOpen } = useAuth();
+
+  const handleAddToCart = () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    addToCart(product);
+  };
 
   return (
     <div className="group relative">
@@ -16,7 +26,7 @@ const ProductCard = ({ product }) => {
         </Link>
         <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors pointer-events-none"></div>
         <button 
-          onClick={() => addToCart(product)}
+          onClick={handleAddToCart}
           className="absolute bottom-6 right-6 p-4 bg-white text-primary-dark rounded-2xl shadow-xl translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary-dark hover:text-white z-10"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

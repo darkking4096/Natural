@@ -1,17 +1,38 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
-import { products } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { useProducts } from '../context/ProductContext';
+import { useAuth } from '../context/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { products, loading } = useProducts();
+  const { user, setIsAuthModalOpen } = useAuth();
+  
   const product = products.find(p => p.id === parseInt(id));
+
+  const handleAddToCart = () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    addToCart(product);
+  };
 
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-surface-secondary">
+        <Loader2 className="animate-spin text-primary" size={48} />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -78,7 +99,7 @@ const ProductDetail = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <button 
-                onClick={() => addToCart(product)}
+                onClick={handleAddToCart}
                 className="flex-1 px-8 py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary-dark transition-all transform hover:scale-[1.02] shadow-lg shadow-primary/20"
               >
                 Adicionar ao Carrinho
