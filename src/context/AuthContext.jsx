@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     // Check active sessions and sets the user
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session?.user) {
         setUser(session.user);
         await fetchProfile(session.user.id);
@@ -48,8 +48,10 @@ export const AuthProvider = ({ children }) => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
-      } else {
+      } else if (data) {
         setProfile(data);
+      } else {
+        console.log('No profile found yet for this user');
       }
     } catch (err) {
       console.error('Fetch profile error:', err);
@@ -65,14 +67,14 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
-    
+
     // Create profile entry for the new user
     if (data.user) {
       await supabase.from('profiles').insert([
         { id: data.user.id, email: data.user.email, is_admin: false }
       ]);
     }
-    
+
     return data;
   };
 
@@ -85,16 +87,16 @@ export const AuthProvider = ({ children }) => {
       // Force local state cleanup and reload page to clear all caches
       setUser(null);
       setProfile(null);
-      window.location.href = '/'; 
+      window.location.href = '/';
     }
   };
 
   const isAdmin = profile?.is_admin || false;
 
   return (
-    <AuthContext.Provider value={{ 
+    <AuthContext.Provider value={{
       user, profile, isAdmin, loading, login, register, logout,
-      isAuthModalOpen, setIsAuthModalOpen 
+      isAuthModalOpen, setIsAuthModalOpen
     }}>
       {children}
     </AuthContext.Provider>
