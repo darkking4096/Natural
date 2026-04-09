@@ -18,12 +18,10 @@ export const ProductProvider = ({ children }) => {
 
       if (error) {
         console.error('Error fetching products from Supabase:', error);
-        // Fallback to initial products if table is empty or doesn't exist yet
         setProducts(initialProducts);
-      } else if (data && data.length > 0) {
-        setProducts(data);
       } else {
-        setProducts(initialProducts);
+        // If data is empty array, also fallback to initialProducts for the first run
+        setProducts(data && data.length > 0 ? data : initialProducts);
       }
     } catch (err) {
       console.error('Fetch products error:', err);

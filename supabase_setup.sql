@@ -27,7 +27,7 @@ begin
   values (new.id, new.email, false);
   return new;
 end;
-$$ language plpgsql security modeller;
+$$ language plpgsql security definer;
 
 -- Trigger to call function on signup
 create trigger on_auth_user_created
