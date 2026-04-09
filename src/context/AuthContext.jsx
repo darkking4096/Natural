@@ -82,9 +82,10 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      // Force local state cleanup regardless of Supabase response
+      // Force local state cleanup and reload page to clear all caches
       setUser(null);
       setProfile(null);
+      window.location.href = '/'; 
     }
   };
 
