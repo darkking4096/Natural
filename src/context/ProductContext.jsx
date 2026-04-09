@@ -10,32 +10,20 @@ export const ProductProvider = ({ children }) => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    
-    // Safety timeout: if Supabase takes too long, fallback to mock data
-    const timeoutId = setTimeout(() => {
-      if (loading) {
-        console.warn('Supabase fetch timed out, falling back to mock data');
-        setProducts(initialProducts);
-        setLoading(false);
-      }
-    }, 5000);
-
     try {
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('id', { ascending: true });
 
-      clearTimeout(timeoutId);
-
       if (error) {
         console.error('Error fetching products from Supabase:', error);
         setProducts(initialProducts);
       } else {
+        // Fallback to initial products if table is empty
         setProducts(data && data.length > 0 ? data : initialProducts);
       }
     } catch (err) {
-      clearTimeout(timeoutId);
       console.error('Fetch products error:', err);
       setProducts(initialProducts);
     } finally {

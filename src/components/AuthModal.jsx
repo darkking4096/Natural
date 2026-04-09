@@ -9,7 +9,6 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
   
   const { login, register } = useAuth();
 
@@ -29,18 +28,12 @@ const AuthModal = ({ isOpen, onClose }) => {
     try {
       if (isLogin) {
         await login(email, password);
-        onClose();
       } else {
         await register(email, password);
-        setSuccess(true);
-        // If "Confirm Email" is OFF in Supabase, they'll be logged in. 
-        // If it's ON, they'll see this message.
-        setTimeout(() => {
-          if (!error) onClose();
-        }, 3000);
       }
+      onClose();
     } catch (err) {
-      setError(err.message === 'Failed to fetch' ? 'Erro de conexão: Verifique se o servidor Vite foi reiniciado e se as chaves em .env estão corretas.' : err.message || 'Ocorreu um erro');
+      setError(err.message || 'Ocorreu um erro');
     } finally {
       setLoading(false);
     }
@@ -69,18 +62,9 @@ const AuthModal = ({ isOpen, onClose }) => {
               {isLogin ? 'Bem-vindo de volta' : 'Crie sua conta'}
             </h2>
             <p className="text-text-secondary">
-              {success 
-                ? 'Verifique seu e-mail para confirmar a conta (se necessário) ou faça login.' 
-                : (isLogin ? 'Acesse para finalizar suas compras' : 'Comece sua jornada natural hoje')}
+              {isLogin ? 'Acesse para finalizar suas compras' : 'Comece sua jornada natural hoje'}
             </p>
           </div>
-
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 text-green-600 text-sm rounded-xl border border-green-100 flex items-center gap-2 animate-in slide-in-from-top-2">
-              <Check size={20} />
-              Conta criada com sucesso!
-            </div>
-          )}
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 animate-in slide-in-from-top-2">
